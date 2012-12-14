@@ -2,20 +2,25 @@
  jQuery Simple Slider
 
  Copyright (c) 2012 James Smith (http://loopj.com)
-
+ 
  Licensed under the MIT license (http://mit-license.org/)
 */
 
 var __slice = [].slice,
-  __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
+    __indexOf = [].indexOf ||
+    function(item) {
+    for (var i = 0, l = this.length; i < l; i++) {
+      if (i in this && this[i] === item) return i;
+    }
+    return -1;
+    };
 
 (function($, window) {
   var SimpleSlider;
   SimpleSlider = (function() {
 
     function SimpleSlider(input, options) {
-      var ratio,
-        _this = this;
+      var ratio, _this = this;
       this.input = input;
       this.defaultOptions = {
         animate: true,
@@ -46,7 +51,7 @@ var __slice = [].slice,
       }).appendTo(this.slider);
       this.dragger = $("<div>").addClass("dragger").css({
         position: "absolute",
-        top: "50%",
+        top: "3px",
         userSelect: "none",
         cursor: "pointer"
       }).appendTo(this.slider);
@@ -95,6 +100,41 @@ var __slice = [].slice,
           });
         }
       });
+
+
+      this.track.bind("touchstart", function(e) {
+        var touch = e.originalEvent.touches[0];
+        _this.domDrag(touch.pageX, touch.pageY, true);
+        _this.dragging = true;
+        return false;
+      });
+      this.dragger.bind("touchstart", function(e) {
+        var touch = e.originalEvent.touches[0];
+        _this.dragging = true;
+        _this.dragger.addClass("dragging");
+        _this.domDrag(touch.pageX, touch.pageY);
+        return false;
+      });
+
+      $(window).bind("touchmove", function(e) {
+        var touch = e.originalEvent.touches[0];
+        if (_this.dragging) {
+          _this.domDrag(touch.pageX, touch.pageY);
+          return $("body").css({
+            cursor: "pointer"
+          });
+        }
+      }).bind("touchend", function(e) {
+        if (_this.dragging) {
+          _this.dragging = false;
+          _this.dragger.removeClass("dragging");
+          return $("body").css({
+            cursor: "auto"
+          });
+        }
+      });
+
+
       this.pagePos = 0;
       if (this.input.val() === "") {
         this.value = this.getRange().min;
